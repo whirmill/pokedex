@@ -93,9 +93,11 @@ class _BrowseScreenState extends State<BrowseScreen> {
       if (this._searchIcon.icon == Icons.search) {
         this._searchIcon = Icon(Icons.close);
         this._appBarTitle = TextField(
+          autofocus: true,
           controller: _filter,
           decoration: InputDecoration(
-              prefixIcon: Icon(Icons.search), hintText: 'Search...'),
+              // prefixIcon: Icon(Icons.search),
+              hintText: 'Cerca pokemon...'),
         );
       } else {
         this._searchIcon = Icon(Icons.search);
