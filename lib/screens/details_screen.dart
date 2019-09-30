@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import '../models/pokemon_model.dart';
 import '../providers/poke_api_provider.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({this.optionStyle});
+class DetailsScreen extends StatelessWidget {
+  const DetailsScreen({this.optionStyle, this.pokemonName});
 
   final TextStyle optionStyle;
+  final String pokemonName;
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +20,16 @@ class HomeScreen extends StatelessWidget {
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
                   centerTitle: true,
-                  title: Text("Ciao, sono il professor Oak",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                      )),
+                  title: AnimatedOpacity(
+                    duration: Duration(milliseconds: 300),
+                    //opacity: top == 80.0 ? 1.0 : 0.0,
+                    opacity: 1.0,
+                    child: Text(pokemonName,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                        )),
+                  ),
                   // titlePadding: EdgeInsets.symmetric(vertical: 100),
                   background: Image.asset(
                     "assets/images/prof_oak.jpeg",
@@ -34,7 +40,7 @@ class HomeScreen extends StatelessWidget {
         },
         body: Center(
           child: FutureBuilder<PokemonModel>(
-            future: PokeApiProvider().fetchPokemonByName("ditto"),
+            future: PokeApiProvider().fetchPokemonByName(pokemonName),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Center(
