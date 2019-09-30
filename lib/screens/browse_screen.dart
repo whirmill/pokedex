@@ -8,19 +8,19 @@ class BrowseScreen extends StatefulWidget {
   final TextStyle optionStyle;
 
   @override
-  _BrowseScreenState createState() => new _BrowseScreenState();
+  _BrowseScreenState createState() => _BrowseScreenState();
 }
 
 class _BrowseScreenState extends State<BrowseScreen> {
-  // final formKey = new GlobalKey<FormState>();
-  // final key = new GlobalKey<ScaffoldState>();
-  final TextEditingController _filter = new TextEditingController();
-  final dio = new Dio();
+  // final formKey = GlobalKey<FormState>();
+  // final key = GlobalKey<ScaffoldState>();
+  final TextEditingController _filter = TextEditingController();
+  final dio = Dio();
   String _searchText = "";
-  List names = new List();
-  List filteredNames = new List();
-  Icon _searchIcon = new Icon(Icons.search);
-  Widget _appBarTitle = new Text('Search Example');
+  List<String> names = List<String>();
+  List<String> filteredNames = List<String>();
+  Icon _searchIcon = Icon(Icons.search);
+  Widget _appBarTitle = Text('Cerca pokemon');
 
   _BrowseScreenState() {
     _filter.addListener(() {
@@ -54,10 +54,10 @@ class _BrowseScreenState extends State<BrowseScreen> {
   }
 
   Widget _buildBar(BuildContext context) {
-    return new AppBar(
+    return AppBar(
       centerTitle: true,
       title: _appBarTitle,
-      leading: new IconButton(
+      leading: IconButton(
         icon: _searchIcon,
         onPressed: _searchPressed,
       ),
@@ -66,27 +66,21 @@ class _BrowseScreenState extends State<BrowseScreen> {
 
   Widget _buildList() {
     if (_searchText.isNotEmpty) {
-      List tempList = new List();
-      for (int i = 0; i < filteredNames.length; i++) {
-        if (filteredNames[i]['name']
-            .toLowerCase()
-            .contains(_searchText.toLowerCase())) {
-          tempList.add(filteredNames[i]);
-        }
-      }
-      filteredNames = tempList;
+      filteredNames = filteredNames
+          .where((e) => e.toLowerCase().contains(_searchText.toLowerCase()))
+          .toList();
     }
     return ListView.builder(
       itemCount: names == null ? 0 : filteredNames.length,
       itemBuilder: (BuildContext context, int index) {
-        return new ListTile(
-          title: Text(filteredNames[index]['name']),
+        return ListTile(
+          title: Text(filteredNames[index]),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      DetailsScreen(pokemonName: filteredNames[index]['name'])),
+                      DetailsScreen(pokemonName: filteredNames[index])),
             );
           },
         );
@@ -97,15 +91,15 @@ class _BrowseScreenState extends State<BrowseScreen> {
   void _searchPressed() {
     setState(() {
       if (this._searchIcon.icon == Icons.search) {
-        this._searchIcon = new Icon(Icons.close);
-        this._appBarTitle = new TextField(
+        this._searchIcon = Icon(Icons.close);
+        this._appBarTitle = TextField(
           controller: _filter,
-          decoration: new InputDecoration(
-              prefixIcon: new Icon(Icons.search), hintText: 'Search...'),
+          decoration: InputDecoration(
+              prefixIcon: Icon(Icons.search), hintText: 'Search...'),
         );
       } else {
-        this._searchIcon = new Icon(Icons.search);
-        this._appBarTitle = new Text('Search Example');
+        this._searchIcon = Icon(Icons.search);
+        this._appBarTitle = Text('Cerca pokemon');
         filteredNames = names;
         _filter.clear();
       }
@@ -115,13 +109,12 @@ class _BrowseScreenState extends State<BrowseScreen> {
   void _getNames() async {
     final response =
         await dio.get('https://pokeapi.co/api/v2/pokemon?limit=151');
-    List tempList = new List();
-    for (int i = 0; i < response.data['results'].length; i++) {
-      tempList.add(response.data['results'][i]);
-    }
+    List<String> tempList = (response.data['results'] as List)
+        .map((e) => (e['name'] as String))
+        .toList();
+
     setState(() {
       names = tempList;
-      // names.shuffle();
       filteredNames = names;
     });
   }
